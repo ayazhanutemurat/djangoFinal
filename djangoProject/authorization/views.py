@@ -11,7 +11,7 @@ class RegisterView(APIView):
     def post(self, request):
         try:
             if User.objects.filter(username=request.data.get('username')).first():
-                raise Exception('Not found')
+                raise Exception('User exists')
             serializer = RegistrationSerializer(data={"username": request.data.get('username'),
                                                       "password": request.data.get('password'),
                                                       "email": request.data.get('email'),

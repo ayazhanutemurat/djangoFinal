@@ -11,7 +11,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email, first_name=first_name, last_name=last_name, cur_city=city, **extra_fields)
+        user = self.model(username=username, email=email, first_name=first_name, last_name=last_name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -38,11 +38,6 @@ class User(AbstractUser):
     roles = models.CharField(choices=USER_ROLES, default=GUEST, max_length=150, null=True, blank=True)
     objects = UserManager()
 
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-        ordering = ['roles', 'username', 'first_name', 'last_name']
-
     def __str__(self):
         return self.first_name + " " + self.last_name
 
@@ -51,7 +46,3 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name='Номер телефона')
     bio = models.TextField(max_length=500, blank=True, verbose_name='Информация')
-
-    class Meta:
-        verbose_name = 'Профиль'
-        verbose_name_plural = 'Профили'

@@ -14,9 +14,7 @@ from books.permissions import AdminPermission
 
 
 class BookView(viewsets.ViewSet):
-    def get_permissions(self):
-        permission_classes = (AdminPermission)
-        return permission_classes
+    permission_classes = (AdminPermission,)
 
     def list(self, request):
         books = Book.objects.all()
@@ -29,12 +27,10 @@ class BookView(viewsets.ViewSet):
         serializer = BookSerializer(book)
         return Response(serializer.data)
 
-    def create(self, request, pk):
-        book = Book.objects.get(id=pk)
-        serializer = BookSerializer(book)
+    def create(self, request):
+        serializer = BookSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            # book.add(book)
             return Response(serializer.data)
         return Response(serializer.errors)
 
@@ -46,11 +42,16 @@ class BookView(viewsets.ViewSet):
         except Book.DoesNotExist as e:
             return Response({"error": str(e)})
 
+    def update(self, request, pk=None):
+        instance = Book.objects.get(pk=pk)
+        serializer = BookSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 
 class JournalView(viewsets.ViewSet):
-    def get_permissions(self):
-        permission_classes = (AdminPermission)
-        return permission_classes
+    permission_classes = (AdminPermission,)
 
     def list(self, request):
         journals = Journal.objects.all()
@@ -63,9 +64,8 @@ class JournalView(viewsets.ViewSet):
         serializer = JournalSerializer(journal)
         return Response(serializer.data)
 
-    def create(self, request, pk):
-        journal = Journal.objects.get(id=pk)
-        serializer = JournalSerializer(journal)
+    def create(self, request):
+        serializer = JournalSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -79,5 +79,11 @@ class JournalView(viewsets.ViewSet):
         except Journal.DoesNotExist as e:
             return Response({"error": str(e)})
 
+    def update(self, request, pk=None):
+        instance = Journal.objects.get(pk=pk)
+        serializer = JournalSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
